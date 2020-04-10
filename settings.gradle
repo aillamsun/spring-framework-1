@@ -40,3 +40,6 @@ rootProject.name = 'spring'
 rootProject.children.each {project ->
 	project.buildFileName = "${project.name}.gradle"
 }
+include 'spring-williamsun-test'
+include 'spring-williamsun-mvc-test'
+
