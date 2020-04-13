@@ -8,6 +8,8 @@ public class TestBean {
 
 	private String name = "williamsun";
 
+	private TestRefBean refBean;
+
 	public TestBean(String name) {
 		this.name = name;
 	}
@@ -28,5 +30,13 @@ public class TestBean {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public TestRefBean getRefBean() {
+		return refBean;
+	}
+
+	public void setRefBean(TestRefBean refBean) {
+		this.refBean = refBean;
 	}
 }

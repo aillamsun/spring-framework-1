@@ -3,6 +3,14 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="myTestBean" class="org.williamsun.spring.test.TestBean"/>
+	<bean id="myTestBean" class="org.williamsun.spring.test.TestBean">
+		<property name="name" value="sungang"/>
+		<property name="refBean">
+			<ref bean="testRefBean"/>
+		</property>
+	</bean>
 
+	<bean id="testRefBean" class="org.williamsun.spring.test.TestRefBean">
+		<property name="age" value="20"/>
+	</bean>
 </beans>

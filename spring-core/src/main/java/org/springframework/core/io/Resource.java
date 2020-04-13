@@ -34,6 +34,10 @@ import org.springframework.lang.Nullable;
  * physical form, but a URL or File handle can just be returned for
  * certain resources. The actual behavior is implementation-specific.
  *
+ * Resource接口抽象了所有Spring内部使用到的底层资源：File、URL、Classpath等
+ *
+ * 它定义了3个判断当前资源状态的方法：存在性(exists)、可读性(isReadable)、是否处于打开状态(isOpen)。
+ *
  * @author Juergen Hoeller
  * @since 28.12.2003
  * @see #getInputStream()

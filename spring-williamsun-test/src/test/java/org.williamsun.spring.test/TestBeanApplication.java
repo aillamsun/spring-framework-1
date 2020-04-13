@@ -11,7 +11,6 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class TestBeanApplication {
 
-
 	@Test
 	public void testBean1() {
 		BeanFactory bf = new XmlBeanFactory(new ClassPathResource("spring-config.xml"));

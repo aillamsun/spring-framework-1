@@ -139,6 +139,8 @@ public class XmlBeanFactoryTests {
 		reader.loadBeanDefinitions(REFTYPES_CONTEXT);
 
 		TestBean emma = (TestBean) xbf.getBean("emma");
+		TestBean emma1 = (TestBean) xbf.getBean("emma");
+
 		TestBean georgia = (TestBean) xbf.getBean("georgia");
 		ITestBean emmasJenks = emma.getSpouse();
 		ITestBean georgiasJenks = georgia.getSpouse();
