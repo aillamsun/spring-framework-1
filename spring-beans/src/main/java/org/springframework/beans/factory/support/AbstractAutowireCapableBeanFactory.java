@@ -40,15 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyAccessorUtils;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
-import org.springframework.beans.TypeConverter;
+import org.springframework.beans.*;
 import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanCreationException;
@@ -590,31 +582,31 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// ******************************************** 重点部分 为了解决循环依赖  ********************************************
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
-
 		// 解决单例模式的循环依赖
-		// 单例模式 & 允许循环依赖&当前单例 bean 是否正在被创建
+		// 判断Spring是否配置了支持提前暴露目标bean，也就是是否支持提前暴露半成品的bean
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences && isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
 			}
-			//为避免后期循环依赖，可以在bean初始化完成前将创建实例的ObjectFactory加入工厂
-			//依赖处理：在Spring中会有循环依赖的情况，例如，当A中含有B的属性，而B中又含有A的属性时就会
-			//构成一个循环依赖，此时如果A和B都是单例，那么在Spring中的处理方式就是当创建B的时候，涉及
-			//自动注入A的步骤时，并不是直接去再次创建A，而是通过放入缓存中的ObjectFactory来创建实例，
-			//这样就解决了循环依赖的问题。
+			// 如果支持，这里就会将当前生成的半成品的bean放到singletonFactories中，这个singletonFactories
+			// 就是前面第一个getSingleton()方法中所使用到的singletonFactories属性，也就是说，这里就是
+			// 封装半成品的bean的地方。而这里的getEarlyBeanReference()本质上是直接将放入的第三个参数，也就是
+			// 目标bean直接返回
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
+		// ******************************************** 重点部分 为了解决循环依赖  ********************************************
 		// Initialize the bean instance.
 		/**
 		 * 开始初始化 bean 实例对象
 		 */
 		Object exposedObject = bean;
 		try {
-			// 对 bean 进行填充，将各个属性值注入，其中，可能存在依赖于其他 bean 的属性
-			// 则会递归初始依赖 bean
+			// 对 bean 进行填充，将各个属性值注入，
+			// 在初始化实例之后，这里就是判断当前bean是否依赖了其他的bean，如果依赖了，就会递归的调用getBean()方法尝试获取目标bean
 			populateBean(beanName, mbd, instanceWrapper);
 			// 调用初始化方法，比如 init-method
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
@@ -1115,6 +1107,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Create a new instance for the specified bean, using an appropriate instantiation strategy:
 	 * factory method, constructor autowiring, or simple instantiation.
+	 * <p>
+	 * bean 初始化策略相关
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd      the bean definition for the bean
@@ -1170,18 +1164,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return instantiateBean(beanName, mbd);
 			}
 		}
-
 		// Need to determine the constructor...
 		// 确定解析的构造函数
 		// 主要是检查已经注册的 SmartInstantiationAwareBeanPostProcessor
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
-		if (ctors != null ||
-				mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR ||
-				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+
+		// mbd.hasConstructorArgumentValues() 检查当前BeanDefinition 是否包含构造函数注入  constructor-arg
+		if (ctors != null || mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR || mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
 			// 构造函数自动注入
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
-
 		// No special handling: simply use no-arg constructor.
 		//使用默认构造函数注入
 		return instantiateBean(beanName, mbd);
@@ -1274,8 +1266,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			Object beanInstance;
 			final BeanFactory parent = this;
 			if (System.getSecurityManager() != null) {
-				beanInstance = AccessController.doPrivileged((PrivilegedAction<Object>) () -> getInstantiationStrategy().instantiate(mbd, beanName, parent),
-						getAccessControlContext());
+				beanInstance = AccessController.doPrivileged((PrivilegedAction<Object>) () -> getInstantiationStrategy().instantiate(mbd, beanName, parent), getAccessControlContext());
 			} else {
 				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
 			}
@@ -1694,6 +1685,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) && !PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
 				if (convertible) {
+					// 设置value
 					convertedValue = convertForProperty(resolvedValue, propertyName, bw, converter);
 				}
 				// Possibly store converted value in merged bean definition,
@@ -1720,6 +1712,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
+			/**
+			 * 进去 会通过反射 设置具体属性value
+			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#setPropertyValue(PropertyValue) 
+			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#setPropertyValue(AbstractNestablePropertyAccessor.PropertyTokenHolder, PropertyValue) # processLocalProperty
+			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#set
+			 * @see org.springframework.beans.BeanWrapperImpl.BeanPropertyHandler#setValue(Object)
+			 */
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		} catch (BeansException ex) {
 			throw new BeanCreationException(

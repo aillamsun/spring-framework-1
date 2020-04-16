@@ -77,9 +77,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 					try {
 						if (System.getSecurityManager() != null) {
-							constructorToUse = AccessController.doPrivileged(
-									(PrivilegedExceptionAction<Constructor<?>>) () ->
-											clazz.getDeclaredConstructor());
+							constructorToUse = AccessController.doPrivileged((PrivilegedExceptionAction<Constructor<?>>) () -> clazz.getDeclaredConstructor());
 						} else {
 							//利用反射获取构造器
 							constructorToUse = clazz.getDeclaredConstructor();

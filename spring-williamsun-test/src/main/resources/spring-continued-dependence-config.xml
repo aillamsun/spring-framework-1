@@ -3,14 +3,17 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="myTestBean" class="org.williamsun.spring.test.TestBean">
-		<property name="name" value="sungang"/>
-		<property name="refBean">
-			<ref bean="testRefBean"/>
-		</property>
+
+	<bean id="a" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBean1">
+		<constructor-arg index="0" ref="b"/>
 	</bean>
 
-	<bean id="testRefBean" class="org.williamsun.spring.test.TestRefBean">
-		<property name="age" value="20"/>
+	<bean id="b" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBean2">
+		<constructor-arg index="0" ref="c"/>
 	</bean>
+
+	<bean id="c" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBean3">
+		<constructor-arg index="0" ref="a"/>
+	</bean>
+
 </beans>

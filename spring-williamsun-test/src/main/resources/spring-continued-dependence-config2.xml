@@ -4,16 +4,14 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-	<bean id="a" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBean1">
-		<constructor-arg index="0" ref="b"/>
+	<bean id="a" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBeanA">
+		<property name="b" ref="b"/>
 	</bean>
 
-	<bean id="b" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBean2">
-		<constructor-arg index="0" ref="c"/>
+
+	<bean id="b" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBeanB">
+		<property name="a" ref="a"/>
 	</bean>
 
-	<bean id="c" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBean3">
-		<constructor-arg index="0" ref="a"/>
-	</bean>
 
 </beans>

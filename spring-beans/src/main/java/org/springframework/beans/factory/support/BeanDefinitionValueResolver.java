@@ -351,6 +351,7 @@ class BeanDefinitionValueResolver {
 				}
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			} else {
+				// 递归
 				bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 			}

@@ -4,14 +4,14 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-	<bean id="a" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBeanA">
-		<property name="b" ref="b"/>
+	<bean id="populateBean" class="org.williamsun.spring.test.populateBean.PopulateBean" autowire="byType">
+		<property name="name" value="张三"/>
+		<property name="age" value="20"/>
+		<property name="ref" ref="populateBeanRef"/>
 	</bean>
 
-
-	<bean id="b" class="org.williamsun.spring.test.continueddependence.ContinuedDependenceBeanB">
-		<property name="a" ref="a"/>
+	<bean id="populateBeanRef" class="org.williamsun.spring.test.populateBean.PopulateBeanRef">
+		<property name="sex" value="男"/>
 	</bean>
-
 
 </beans>

@@ -1,4 +1,4 @@
-package org.williamsun.spring.test.continueddependence;
+package org.williamsun.spring.test;
 
 import org.junit.Test;
 import org.springframework.beans.factory.BeanFactory;
