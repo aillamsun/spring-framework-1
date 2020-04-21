@@ -587,6 +587,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		// 解决单例模式的循环依赖
 		// 判断Spring是否配置了支持提前暴露目标bean，也就是是否支持提前暴露半成品的bean
+		// 三个条件: 1 单例, 2 运行提前暴露bean, 3 当前bean正在创建中
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences && isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
 			if (logger.isDebugEnabled()) {
@@ -596,6 +597,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 就是前面第一个getSingleton()方法中所使用到的singletonFactories属性，也就是说，这里就是
 			// 封装半成品的bean的地方。而这里的getEarlyBeanReference()本质上是直接将放入的第三个参数，也就是
 			// 目标bean直接返回
+
+			// 为什么说是半成品呢，原因是执行addSingletonFactory 是在createBeanInstance 之后，这说明这个 bean 其实已经被创建出来了，但是它还不是很完美（没有进行属性填充和初始化）
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 		// ******************************************** 重点部分 为了解决循环依赖  ********************************************
@@ -1714,7 +1717,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			/**
 			 * 进去 会通过反射 设置具体属性value
-			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#setPropertyValue(PropertyValue) 
+			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#setPropertyValue(PropertyValue)
 			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#setPropertyValue(AbstractNestablePropertyAccessor.PropertyTokenHolder, PropertyValue) # processLocalProperty
 			 * @see org.springframework.beans.AbstractNestablePropertyAccessor#set
 			 * @see org.springframework.beans.BeanWrapperImpl.BeanPropertyHandler#setValue(Object)
@@ -1768,20 +1771,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return null;
 			}, getAccessControlContext());
 		} else {
+			// 对特殊的 bean 处理：Aware、BeanClassLoaderAware、BeanFactoryAware
 			invokeAwareMethods(beanName, bean);
 		}
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 后处理器
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+
+			// 激活用户自定义的 init 方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		} catch (Throwable ex) {
 			throw new BeanCreationException((mbd != null ? mbd.getResourceDescription() : null), beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 后处理器
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
