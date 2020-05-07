@@ -17,4 +17,7 @@ dependencies {
     compile(project(":spring-core"))
     compile(project(":spring-aop"))
     compile(project(":spring-context"))
+    compile(project(":spring-aspects"))
+    compile("org.aspectj:aspectjweaver:1.8.12")  // for Maven POM exposure
+
 }

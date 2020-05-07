@@ -778,9 +778,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 								((SmartFactoryBean<?>) factory).isEagerInit());
 					}
 					if (isEagerInit) {
+						/**
+						 *
+						 */
 						getBean(beanName);
 					}
 				} else {
+					/**
+					 *
+					 */
 					getBean(beanName);
 				}
 			}

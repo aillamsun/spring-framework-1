@@ -31,8 +31,8 @@ import org.springframework.util.Assert;
  * interface, if any, and the corresponding method on the target class).
  *
  * @author Juergen Hoeller
- * @since 2.0
  * @see AnnotationMatchingPointcut
+ * @since 2.0
  */
 public class AnnotationMethodMatcher extends StaticMethodMatcher {
 
@@ -43,6 +43,7 @@ public class AnnotationMethodMatcher extends StaticMethodMatcher {
 
 	/**
 	 * Create a new AnnotationClassFilter for the given annotation type.
+	 *
 	 * @param annotationType the annotation type to look for
 	 */
 	public AnnotationMethodMatcher(Class<? extends Annotation> annotationType) {
@@ -51,11 +52,12 @@ public class AnnotationMethodMatcher extends StaticMethodMatcher {
 
 	/**
 	 * Create a new AnnotationClassFilter for the given annotation type.
+	 *
 	 * @param annotationType the annotation type to look for
 	 * @param checkInherited whether to also check the superclasses and
-	 * interfaces as well as meta-annotations for the annotation type
-	 * (i.e. whether to use {@link AnnotationUtils#findAnnotation(Method, Class)}
-	 * semantics instead of standard Java {@link Method#isAnnotationPresent})
+	 *                       interfaces as well as meta-annotations for the annotation type
+	 *                       (i.e. whether to use {@link AnnotationUtils#findAnnotation(Method, Class)}
+	 *                       semantics instead of standard Java {@link Method#isAnnotationPresent})
 	 * @since 5.0
 	 */
 	public AnnotationMethodMatcher(Class<? extends Annotation> annotationType, boolean checkInherited) {
@@ -63,7 +65,6 @@ public class AnnotationMethodMatcher extends StaticMethodMatcher {
 		this.annotationType = annotationType;
 		this.checkInherited = checkInherited;
 	}
-
 
 
 	@Override
@@ -77,6 +78,7 @@ public class AnnotationMethodMatcher extends StaticMethodMatcher {
 	}
 
 	private boolean matchesMethod(Method method) {
+		// 可以看出判断该Advisor是否使用于bean中的method，只需看method上是否有Advisor的注解
 		return (this.checkInherited ?
 				(AnnotationUtils.findAnnotation(method, this.annotationType) != null) :
 				method.isAnnotationPresent(this.annotationType));
