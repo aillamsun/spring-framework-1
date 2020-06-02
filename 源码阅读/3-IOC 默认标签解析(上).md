@@ -5,6 +5,8 @@
 
 ## 概述
 
+接前篇文章   [2-Spring容器的基本实现][1]
+
     本文主要研究Spring标签的解析，Spring的标签中有默认标签和自定义标签，两者的解析有着很大的不同，这次重点说默认标签的解析过程。
 
     默认标签的解析是在DefaultBeanDefinitionDocumentReader.parseDefaultElement函数中进行的，分别对4种不同的标签（import,alias,bean和beans）做了不同处理。我们先看下此函数的源码：
@@ -1031,3 +1033,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     private Resource resource;
 }
 ```
+
+
+  [1]: https://github.com/aillamsun/spring-framework-1/blob/v5.0.1_williamsun_test/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/2-Spring%E5%AE%B9%E5%99%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%AE%9E%E7%8E%B0.md
