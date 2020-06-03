@@ -1,5 +1,6 @@
 package org.williamsun.spring.test.custom.element;
 
+import org.junit.Test;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -10,7 +11,9 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class AppTest {
 
-	public static void main(String[] args) {
+
+	@Test
+	public void test() {
 		BeanFactory bf = new XmlBeanFactory(new ClassPathResource("spring-customElement.xml"));
 		//MyTestBean myTestBean01 = (MyTestBean) bf.getBean("myTestBean");
 		User user = (User) bf.getBean("user");
