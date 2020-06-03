@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:myTag="http://www.williamsun.com/schema/user"
+
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	    http://www.williamsun.com/schema/user
+	    http://www.williamsun.com/schema/user.xsd
+	   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="myTestBean" class="org.williamsun.spring.test.custom.element.MyTestCustomElementBean">
+		<property name="beanName" value="beanName"/>
+	</bean>
+
+	<myTag:user id="user" userName="孙刚" email="101@qq.com"/>
+	<myTag:phone id="phone" color="red" remark="remark" size="100"/>
+</beans>
