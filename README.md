@@ -1,9 +1,11 @@
 ## Spring Framework v5.0.1 版本分析
 
 
-以下源码分析 涉及到的demo案例 都在项目目录 spring.spring-williamsun-test下 ，目录结构如下图:
+以下源码分析 涉及到的demo案例 都在项目目录 spring.spring-williamsun-test下 ，目录结构如下:
 
-![avatar](/images/springTestCore.png)
+> * src/main/java: demo core
+> * src/amin/resources : demo config
+> * src/test/java: deme test
 
 
 ## 目录
